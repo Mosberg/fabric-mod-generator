@@ -326,18 +326,18 @@
 
 ## Quality Metrics Comparison
 
-|                     | v2.0  | v3.0  | Improvement |
-| ------------------- | ----- | ----- | ----------- |
-| Generators          | 9     | 11    | +22%        |
-| Lines of Code       | 2,500 | 4,200 | +68%        |
-| JSDoc Coverage      | 40%   | 100%  | +150%       |
-| Error Handling      | 50%   | 100%  | +100%       |
-| Performance (cache) | N/A   | 75%↑  | +Infinity   |
-| UI Features         | 5     | 15    | +200%       |
-| Keyboard Shortcuts  | 0     | 5     | +500%       |
-| Mobile Support      | 60%   | 95%   | +58%        |
-| Test Coverage       | 40%   | 85%   | +112%       |
-| Documentation       | 50%   | 95%   | +90%        |
+|                     | v1.0.0 | v3.0  | Improvement |
+| ------------------- | ------ | ----- | ----------- |
+| Generators          | 9      | 11    | +22%        |
+| Lines of Code       | 2,500  | 4,200 | +68%        |
+| JSDoc Coverage      | 40%    | 100%  | +150%       |
+| Error Handling      | 50%    | 100%  | +100%       |
+| Performance (cache) | N/A    | 75%↑  | +Infinity   |
+| UI Features         | 5      | 15    | +200%       |
+| Keyboard Shortcuts  | 0      | 5     | +500%       |
+| Mobile Support      | 60%    | 95%   | +58%        |
+| Test Coverage       | 40%    | 85%   | +112%       |
+| Documentation       | 50%    | 95%   | +90%        |
 
 ---
 
