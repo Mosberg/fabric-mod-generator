@@ -209,7 +209,7 @@
 ╠════════════════════════════════════════════════╣
 ║                                                ║
 ║  Generation Performance:                       ║
-║  ├─ Without Cache:      2.5s - 3.2s           ║
+║  ├─ Without Cache:      2.5s - 1.0.0s           ║
 ║  ├─ With Cache:         0.3s - 0.8s           ║
 ║  └─ Improvement:        75-87% faster         ║
 ║                                                ║

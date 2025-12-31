@@ -1,5 +1,5 @@
 /**
- * Enhanced Fabric Mod Generator v3.2 - Ultra Optimized
+ * Enhanced Fabric Mod Generator v1.0.0 - Ultra Optimized
  * Performance: +60% faster init, +40% less memory, batch DOM ops, cache-aware UI
  * Readability: Modular, destructured, full event delegation, JSDoc everywhere
  * Features: Theme toggle, search/filter, keyboard shortcuts, undo/redo, toast notifications, config profiles
@@ -121,7 +121,7 @@ class FabricModGenerator {
       this.#hideLoading();
       this.renderGenerators();
       this.updateGenerateButton();
-      this.logger.info("✅ v3.2 LOADED - Ultra Optimized [11/11 generators]");
+      this.logger.info("✅ v1.0.0 LOADED - Ultra Optimized [11/11 generators]");
     } catch (error) {
       this.logger.error("Init failed", error);
       this.showToast("Failed to initialize generator", "error");
@@ -403,13 +403,19 @@ class FabricModGenerator {
     const config = this.config.getCurrentConfig();
     const results = [];
     for (const type of this.#selectedGenerators) {
+      // Defensive: skip recipe/event if required type is missing
+      if ((type === "recipe" && !config.recipeType) || (type === "event" && !config.eventType)) {
+        this.logger.warn(`Skipped ${type}: missing required type in config`);
+        this.showToast(`Skipped ${type}: select a ${type} type in options`, "error");
+        continue;
+      }
       try {
         const result = await this.generators.generate(type, config);
         results.push(result);
         this.#generatedFiles.set(result.filename, result.content);
       } catch (error) {
         this.logger.error(`Generation failed for ${type}`, error);
-        this.showToast(`Failed to generate ${type}`, "error");
+        this.showToast(`Failed to generate ${type}", "error");
       }
     }
     this.renderOutput(results);
@@ -457,7 +463,7 @@ class FabricModGenerator {
     this.templateManager.createFullProject(config).then((files) => {
       this.downloadManager.downloadProjectZip(
         files,
-        `${config.modId}-full-project.zip`
+        (config.modId ? config.modId : "mod") + "-full-project.zip"
       );
       this.showToast("Full project exported", "success");
     });
@@ -469,6 +475,7 @@ class FabricModGenerator {
     this.showToast("Output cleared", "info");
   }
 
+  // Make selectAllGenerators public so it can be called from event handlers
   selectAllGenerators() {
     this.#selectedGenerators = new Set([
       "entity",
@@ -508,7 +515,7 @@ class FabricModGenerator {
   updateSelectedCount() {
     const count = this.#selectedGenerators.size;
     const el = document.getElementById("selectedCount");
-    if (el) el.textContent = `(${count} selected)`;
+    if (el) el.textContent = '(' + count + ' selected)';
   }
 
   switchTab(tabName) {
@@ -516,7 +523,7 @@ class FabricModGenerator {
       btn.classList.toggle("active", btn.dataset.tab === tabName);
     });
     document.querySelectorAll(".tab-content").forEach((tab) => {
-      tab.classList.toggle("active", tab.id === `${tabName}-tab`);
+      tab.classList.toggle("active", tab.id === (tabName + "-tab"));
     });
   }
 
@@ -525,12 +532,12 @@ class FabricModGenerator {
       card.classList.toggle("active", card.dataset.mc === version);
     });
     this.config.setMinecraftVersion(version);
-    this.showToast(`Version set: ${version}`, "info");
+    this.showToast('Version set: ' + version, "info");
   }
 
   updateConfigField(field, value) {
     this.config.config[field] = value;
-    this.logger.debug(`Config updated: ${field} = ${value}`);
+    this.logger.debug('Config updated: ' + field + ' = ' + value);
   }
 
   filterGenerators(query) {
@@ -542,7 +549,7 @@ class FabricModGenerator {
 
   showToast(message, type = "info", duration = 3000) {
     const toast = document.createElement("div");
-    toast.className = `toast ${type}`;
+    toast.className = 'toast ' + type;
     toast.textContent = message;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), duration);
@@ -562,7 +569,7 @@ class FabricModGenerator {
     document.documentElement.setAttribute("data-theme", this.#currentTheme);
     localStorage.setItem("theme", this.#currentTheme);
     this.#updateThemeButton();
-    this.logger.info(`Theme switched to ${this.#currentTheme}`);
+    this.logger.info('Theme switched to ' + this.#currentTheme);
   }
 
   #updateThemeButton() {
@@ -605,13 +612,13 @@ class FabricModGenerator {
     });
   }
 
-  saveConfiguration() {
+    saveConfiguration() {
     const config = this.config.getCurrentConfig();
     const profileName = prompt("Profile name:");
     if (profileName) {
-      const key = `fabric_profile_${profileName}`;
+      const key = "fabric_profile_" + profileName;
       localStorage.setItem(key, JSON.stringify(config));
-      this.showToast(`Configuration saved: ${profileName}`, "success");
+      this.showToast("Configuration saved: " + profileName, "success");
       this.logger.info("Configuration saved", { profileName });
     }
   }
@@ -641,16 +648,15 @@ class FabricModGenerator {
     results.forEach((file) => {
       const item = document.createElement("div");
       item.className = "file-item";
-      item.innerHTML = `
-        <div class="file-header">
-          <span class="file-name">${file.filename}</span>
-          <div class="file-actions">
-            <button class="copy-btn">Copy</button>
-            <button class="download-file-btn">Download</button>
-          </div>
-        </div>
-        <pre class="code-block">${file.content}</pre>
-      `;
+      item.innerHTML =
+        '<div class="file-header">' +
+          '<span class="file-name">' + file.filename + '</span>' +
+          '<div class="file-actions">' +
+            '<button class="copy-btn">Copy</button>' +
+            '<button class="download-file-btn">Download</button>' +
+          '</div>' +
+        '</div>' +
+        '<pre class="code-block">' + file.content + '</pre>';
       item.querySelector(".copy-btn").onclick = () => {
         navigator.clipboard.writeText(file.content);
         this.showToast("Copied to clipboard", "success");
@@ -670,4 +676,4 @@ class FabricModGenerator {
 const fabricModGenerator = new FabricModGenerator();
 fabricModGenerator.init();
 
-export { fabricModGenerator };
+export default FabricModGenerator;

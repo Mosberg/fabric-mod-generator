@@ -318,7 +318,7 @@ Add theme toggle button to header:
 </div>
 ```
 
-### 3.2 Generator Search/Filter
+### 1.0.0 Generator Search/Filter
 
 **File:** `index.html` (UPDATE)
 

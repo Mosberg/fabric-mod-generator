@@ -1,21 +1,24 @@
-/**
- * 🔧 FABRIC MOD GENERATOR V3.2 - HOTFIX GUIDE
- * 
- * ERROR: Recipe & Event generators receiving undefined options
- * ROOT CAUSE: app.js not properly passing generatorOptions to generators
- * 
- * SOLUTION: 2 simple fixes
- */
+/\*\*
+
+- 🔧 FABRIC MOD GENERATOR V1.0.0 - HOTFIX GUIDE
+-
+- ERROR: Recipe & Event generators receiving undefined options
+- ROOT CAUSE: app.js not properly passing generatorOptions to generators
+-
+- SOLUTION: 2 simple fixes
+  \*/
 
 ## ISSUE ANALYSIS
 
 ### Error Logs Show:
+
 ```
 [ERROR] [GeneratorManager] generate:recipe {"message":"Unsupported recipe type: undefined",...}
 [ERROR] [GeneratorManager] generate:event {"message":"Unsupported event type: undefined",...}
 ```
 
 ### Root Cause:
+
 The generators expect options in `config.generatorOptions` but app.js passes generic config
 
 ### Fix Location: app.js → generateMod() method
@@ -27,6 +30,7 @@ The generators expect options in `config.generatorOptions` but app.js passes gen
 ### Step 1: Update app.js generateMod() method
 
 **Find this section in app.js (around line 270-290):**
+
 ```javascript
 async generateMod() {
   try {
@@ -43,6 +47,7 @@ async generateMod() {
 ```
 
 **Replace with:**
+
 ```javascript
 async generateMod() {
   try {
@@ -52,13 +57,13 @@ async generateMod() {
     for (const type of this.#selectedGenerators) {
       // Get generator-specific options from UI/form
       const generatorOptions = this._getGeneratorOptions(type);
-      
+
       // Pass complete config with generatorOptions
       const configWithOptions = {
         ...config,
         generatorOptions
       };
-      
+
       const result = await this.generators.generate(type, configWithOptions);
       results.push(result);
       this.#generatedFiles.set(result.filename, result);
@@ -101,7 +106,7 @@ _getGeneratorOptions(type) {
       className: document.getElementById('eventClassName')?.value || 'MyEventListener'
     };
   }
-  
+
   // Return empty object for other generators (they don't use generatorOptions)
   return {};
 }
@@ -110,6 +115,7 @@ _getGeneratorOptions(type) {
 ### Step 3: Update index.html form fields
 
 **Make sure these input elements exist in index.html for recipe options:**
+
 ```html
 <select id="recipeType" name="recipeType">
   <option value="crafting_shaped">Crafting Shaped</option>
@@ -119,18 +125,29 @@ _getGeneratorOptions(type) {
   <option value="blasting">Blasting</option>
 </select>
 
-<input type="text" id="outputItem" name="outputItem" placeholder="examplemod:example_item" value="examplemod:example_item">
-<input type="number" id="outputCount" name="outputCount" value="1">
-<textarea id="ingredients" name="ingredients">A: minecraft:iron_ingot
-B: minecraft:stick</textarea>
-<textarea id="pattern" name="pattern">AAA
- B 
- B </textarea>
-<input type="number" id="cookingTime" name="cookingTime" value="200">
-<input type="number" id="experience" name="experience" step="0.1" value="0.7">
+<input
+  type="text"
+  id="outputItem"
+  name="outputItem"
+  placeholder="examplemod:example_item"
+  value="examplemod:example_item"
+/>
+<input type="number" id="outputCount" name="outputCount" value="1" />
+<textarea id="ingredients" name="ingredients">
+A: minecraft:iron_ingot
+B: minecraft:stick</textarea
+>
+<textarea id="pattern" name="pattern">
+AAA
+ B
+ B </textarea
+>
+<input type="number" id="cookingTime" name="cookingTime" value="200" />
+<input type="number" id="experience" name="experience" step="0.1" value="0.7" />
 ```
 
 **And for event options:**
+
 ```html
 <select id="eventType" name="eventType">
   <option value="server_tick">Server Tick</option>
@@ -141,7 +158,13 @@ B: minecraft:stick</textarea>
   <option value="item_use">Item Use</option>
 </select>
 
-<input type="text" id="eventClassName" name="eventClassName" placeholder="MyEventListener" value="MyEventListener">
+<input
+  type="text"
+  id="eventClassName"
+  name="eventClassName"
+  placeholder="MyEventListener"
+  value="MyEventListener"
+/>
 ```
 
 ---
@@ -151,11 +174,13 @@ B: minecraft:stick</textarea>
 **After applying fixes, check console for:**
 
 ✅ Before:
+
 ```
 [ERROR] Unsupported recipe type: undefined
 ```
 
 ✅ After:
+
 ```
 [INFO] Cache MISS: recipe
 [INFO] Cache MISS: event
@@ -163,6 +188,7 @@ B: minecraft:stick</textarea>
 ```
 
 ### Test in Browser Console:
+
 ```javascript
 // Check if options are being passed correctly
 console.log(fabricModGenerator.config.getCurrentConfig());
@@ -222,22 +248,24 @@ async generateMod() {
 
 ## SUMMARY
 
-**Problem**: Recipe/Event generators get `undefined` types  
-**Cause**: app.js not passing `generatorOptions` in config  
-**Solution**: 
+**Problem**: Recipe/Event generators get `undefined` types
+**Cause**: app.js not passing `generatorOptions` in config
+**Solution**:
+
 1. Update `generateMod()` to include `generatorOptions`
 2. Add `_getGeneratorOptions()` helper method
 3. Update `index.html` form fields (optional but recommended)
 
-**Time to fix**: 5-10 minutes  
-**Impact**: All 11 generators will work properly  
+**Time to fix**: 5-10 minutes
+**Impact**: All 11 generators will work properly
 **Testing**: Run generation, check console logs
 
 ---
 
 **✅ After this fix, your logs should show:**
+
 ```
-[INFO] ✅ v3.2 LOADED - Ultra Optimized [11/11 generators]
+[INFO] ✅ v1.0.0 LOADED - Ultra Optimized [11/11 generators]
 [INFO] Cache MISS: recipe
 [INFO] Cache MISS: event
 [INFO] Generation complete {files: 11}

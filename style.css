@@ -163,6 +163,15 @@
   font-weight: 600;
   margin-bottom: 6px;
 }
+#themeToggle {
+  background: var(--glass);
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 30px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  gap: 18px;
+}
 .options-panel input,
 .options-panel select {
   padding: 10px 14px;

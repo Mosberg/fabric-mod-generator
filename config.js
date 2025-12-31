@@ -9,7 +9,7 @@ export class ConfigManager {
       modId: "example-mod",
       modName: "Example Mod",
       packageName: "com.example",
-      className: "MyExampleEntity",
+      className: "MyEntity",
     };
   }
 
