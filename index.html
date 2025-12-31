@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fabric Mod Generator v2.0 - Minecraft 1.21.10</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>"
+    />
+  </head>
+
+  <body>
+    <div class="app-container" id="app">
+      <!-- Loading Screen -->
+      <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <h1>Initializing Fabric Generator</h1>
+        <p>Loading 16+ generators and templates...</p>
+      </div>
+
+      <!-- Main App -->
+      <div class="main-app" id="mainApp">
+        <header class="app-header">
+          <div class="header-content">
+            <h1 class="logo">
+              <span class="logo-icon">🧩</span>
+              Fabric Mod Generator
+            </h1>
+            <div class="header-meta">
+              <span class="version">v2.0</span>
+              <span class="minecraft-ver">MC 1.21.10</span>
+            </div>
+            <div class="header-actions">
+              <button id="themeToggle" class="theme-btn">🌙</button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Shortcuts Panel -->
+        <div class="shortcuts-panel">
+          <h3>⌨️ Keyboard Shortcuts</h3>
+          <ul>
+            <li><kbd>Ctrl</kbd> + <kbd>G</kbd> - Generate Templates</li>
+            <li><kbd>Ctrl</kbd> + <kbd>E</kbd> - Export Project</li>
+            <li><kbd>Ctrl</kbd> + <kbd>S</kbd> - Save Configuration</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Z</kbd> - Undo</li>
+            <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> - Redo</li>
+          </ul>
+        </div>
+
+        <!-- Config Panel -->
+        <div class="config-panel">
+          <div class="config-tabs">
+            <button class="tab-btn active" data-tab="basic">Basic</button>
+            <button class="tab-btn" data-tab="advanced">Advanced</button>
+            <button class="tab-btn" data-tab="versions">Versions</button>
+          </div>
+
+          <div class="tab-content active" id="basic-tab">
+            <div class="config-grid">
+              <div class="form-group">
+                <label>Mod ID <span class="required">*</span></label>
+                <input type="text" id="modId" value="mana" maxlength="64" />
+                <div class="error-message" id="modId-error"></div>
+                <small>Lowercase, no spaces (e.g., mana)</small>
+              </div>
+              <div class="form-group">
+                <label>Mod Name <span class="required">*</span></label>
+                <input type="text" id="modName" value="Mana Mod" />
+                <div class="error-message" id="modName-error"></div>
+              </div>
+              <div class="form-group">
+                <label>Package <span class="required">*</span></label>
+                <input type="text" id="packageName" value="dk.mosberg" />
+                <div class="error-message" id="packageName-error"></div>
+              </div>
+              <div class="form-group">
+                <label>Class Name <span class="required">*</span></label>
+                <input
+                  type="text"
+                  id="className"
+                  value="MyEntity"
+                  placeholder="e.g., MyEntity"
+                />
+                <div class="error-message" id="className-error"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="advanced-tab">
+            <div class="config-grid">
+              <div class="form-group">
+                <label>Version</label>
+                <input type="text" id="version" value="1.0.0" />
+              </div>
+              <div class="form-group">
+                <label>Authors</label>
+                <input type="text" id="authors" value="Your Name" />
+              </div>
+              <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" rows="3">
+A Fabric mod for Minecraft 1.21.10</textarea
+                >
+              </div>
+              <div class="form-group checkbox-group">
+                <label>
+                  <input type="checkbox" id="clientSideOnly" checked />
+                  Client-side only mod
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="versions-tab">
+            <div class="version-grid">
+              <div class="version-card active" data-mc="1.21.10">
+                <h4>1.21.10</h4>
+                <small>Latest Stable</small>
+              </div>
+              <div class="version-card" data-mc="1.21">
+                <h4>1.21</h4>
+                <small>Stable</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generator Selection -->
+        <div class="generator-section">
+          <div class="section-header">
+            <h2>Generators <span id="selectedCount">(0 selected)</span></h2>
+            <div class="generator-controls">
+              <button class="btn-secondary" id="selectAllBtn">
+                Select All
+              </button>
+              <button class="btn-secondary" id="clearAllBtn">Clear All</button>
+              <input
+                type="text"
+                id="generatorSearch"
+                placeholder="Search generators..."
+                class="search-input"
+              />
+            </div>
+          </div>
+          <div class="generator-grid" id="generatorGrid"></div>
+        </div>
+
+        <!-- Dynamic Generator Options Panel -->
+        <div
+          class="options-panel"
+          id="optionsPanel"
+          style="display: none"
+        ></div>
+
+        <!-- Actions -->
+        <div class="action-bar">
+          <button class="btn-primary" id="generateBtn" disabled>
+            Generate Template
+          </button>
+          <button class="btn-secondary" id="previewBtn">Preview</button>
+          <button class="btn-secondary" id="exportProjectBtn">
+            Export Full Project
+          </button>
+        </div>
+
+        <!-- Output -->
+        <div class="output-panel" id="outputPanel">
+          <div class="output-header">
+            <h3>Generated Files <span id="fileCount">0</span></h3>
+            <div class="output-actions">
+              <button class="btn-primary" id="downloadBtn" disabled>
+                Download ZIP
+              </button>
+              <button class="btn-secondary" id="copyAllBtn">Copy All</button>
+              <button class="btn-secondary" id="clearOutputBtn">Clear</button>
+            </div>
+          </div>
+          <div class="output-content" id="outputContent"></div>
+        </div>
+      </div>
+    </div>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
