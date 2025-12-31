@@ -98,6 +98,24 @@
   --error: #cb2431;
 }
 
+.shortcuts-panel {
+  background: var(--glass);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 30px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  text-align: center;
+  gap: 20px;
+}
+
+.shortcuts-panel li {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  list-style: none;
+}
+
 /* Toast Notifications */
 .toast {
   position: fixed;
