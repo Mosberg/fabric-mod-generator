@@ -1,19 +1,51 @@
 export class TemplateManager {
-  async createFullProject(config) {
-    const files = {
-      "build.gradle": this.getBuildGradle(config),
-      "gradle.properties": this.getGradleProperties(config),
-      "src/main/resources/fabric.mod.json": this.getFabricModJson(config),
-      "src/main/resources/META-INF/mods.toml": this.getModsToml(config),
-      ".gitignore": this.getGitignore(),
-      "README.md": this.getReadme(config),
-    };
-
-    // Add example main class
+  /**
+   * Create a full project export with optional custom folder structure and advanced settings.
+   * @param {Object} config - Mod config
+   * @param {Object} [options] - Advanced export options
+   *   options.folderMap: { [logicalPath]: physicalPath }
+   *   options.extraFiles: { [filename]: content }
+   *   options.includeDocs: boolean
+   *   options.includeExampleAssets: boolean
+   */
+  async createFullProject(config, options = {}) {
+    const folderMap = options.folderMap || {};
+    const files = {};
+    // Core files
+    files[folderMap["build.gradle"] || "build.gradle"] =
+      this.getBuildGradle(config);
+    files[folderMap["gradle.properties"] || "gradle.properties"] =
+      this.getGradleProperties(config);
     files[
-      "src/main/java/" + config.packageName.replace(/\./g, "/") + "/Mod.java"
+      folderMap["fabric.mod.json"] || "src/main/resources/fabric.mod.json"
+    ] = this.getFabricModJson(config);
+    files[folderMap["mods.toml"] || "src/main/resources/META-INF/mods.toml"] =
+      this.getModsToml(config);
+    files[folderMap[".gitignore"] || ".gitignore"] = this.getGitignore();
+    files[folderMap["README.md"] || "README.md"] = this.getReadme(config);
+    // Main class
+    files[
+      folderMap["Mod.java"] ||
+        "src/main/java/" + config.packageName.replace(/\./g, "/") + "/Mod.java"
     ] = this.getModInitializer(config);
-
+    // Optionally include docs
+    if (options.includeDocs) {
+      files[folderMap["docs/QUICK_START.md"] || "docs/QUICK_START.md"] =
+        "# Quick Start\nSee README.md for setup.";
+    }
+    // Optionally include example assets
+    if (options.includeExampleAssets) {
+      files[
+        folderMap["assets/icon.png"] ||
+          `src/main/resources/assets/${config.modId}/icon.png`
+      ] = "<binary:icon>";
+    }
+    // Extra files
+    if (options.extraFiles) {
+      Object.entries(options.extraFiles).forEach(([k, v]) => {
+        files[folderMap[k] || k] = v;
+      });
+    }
     return files;
   }
 

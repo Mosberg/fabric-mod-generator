@@ -1,3 +1,76 @@
+/* Profile Actions UI */
+.profile-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.profile-actions label {
+  margin-bottom: 0;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.profile-actions select {
+  min-width: 120px;
+}
+.profile-actions button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.profile-actions button:hover,
+.profile-actions button:focus {
+  background: var(--primary);
+  color: #222;
+  outline: none;
+}
+.profile-actions button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Generator Card Accessibility & Hover */
+.generator-card {
+  outline: none;
+  transition: box-shadow 0.2s, border 0.2s;
+}
+.generator-card:focus,
+.generator-card:hover {
+  box-shadow: 0 0 0 3px var(--primary);
+  border: 2px solid var(--primary);
+  z-index: 2;
+}
+.generator-card.active {
+  border: 2px solid var(--success);
+  background: rgba(72, 187, 120, 0.08);
+}
+
+/* Tooltip for profile buttons */
+.profile-actions button[title] {
+  position: relative;
+}
+.profile-actions button[title]:hover::after,
+.profile-actions button[title]:focus::after {
+  content: attr(title);
+  position: absolute;
+  left: 50%;
+  bottom: 120%;
+  transform: translateX(-50%);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  pointer-events: none;
+}
 :root,
 [data-theme="dark"] {
   --bg-primary: #0f1419;

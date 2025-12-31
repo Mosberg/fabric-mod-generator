@@ -24,6 +24,7 @@ const generatorImports = [
   ["screen", "./generators/screenGenerator.js"],
   ["recipe", "./generators/recipeEventGenerator.js"],
   ["event", "./generators/recipeEventGenerator.js"],
+  ["biome", "./generators/biomeGenerator.js"],
 ];
 
 async function loadGenerators() {
@@ -158,6 +159,123 @@ class FabricModGenerator {
         "input",
         this.#handleSearch.bind(this)
       );
+
+    // Profile management events
+    const saveBtn = document.getElementById("saveProfileBtn");
+    const loadBtn = document.getElementById("loadProfileBtn");
+    const deleteBtn = document.getElementById("deleteProfileBtn");
+    const exportBtn = document.getElementById("exportProfileBtn");
+    const importBtn = document.getElementById("importProfileBtn");
+    const importInput = document.getElementById("importProfileInput");
+    const select = document.getElementById("profileSelect");
+    const clearCacheBtn = document.getElementById("clearCacheBtn");
+
+    if (saveBtn) saveBtn.onclick = () => this.saveProfile();
+    if (loadBtn) loadBtn.onclick = () => this.loadProfile();
+    if (deleteBtn) deleteBtn.onclick = () => this.deleteProfile();
+    if (exportBtn) exportBtn.onclick = () => this.exportProfile();
+    if (importBtn) importBtn.onclick = () => importInput && importInput.click();
+    if (importInput) importInput.onchange = (e) => this.importProfile(e);
+    if (select) this.updateProfileSelect();
+    if (clearCacheBtn) clearCacheBtn.onclick = () => {
+      this.generators.clearCache();
+      this.showToast("Cache cleared", "info");
+      this.updateCacheStats();
+    };
+    this.updateCacheStats();
+    updateCacheStats() {
+      const stats = this.generators.getStats();
+      const el = document.getElementById("cacheStats");
+      if (el && stats) {
+        el.textContent = `Cache: ${stats.items} items, ${stats.hits} hits, ${stats.misses} misses, hit rate: ${stats.hitRate}`;
+      }
+    }
+  }
+
+  saveProfile() {
+    const profileName = prompt("Profile name:");
+    if (!profileName) return;
+    const config = this.config.getCurrentConfig();
+    localStorage.setItem(
+      `fabric_profile_${profileName}`,
+      JSON.stringify(config)
+    );
+    this.showToast(`Profile saved: ${profileName}`, "success");
+    this.updateProfileSelect();
+  }
+
+  loadProfile() {
+    const select = document.getElementById("profileSelect");
+    if (!select || !select.value) return;
+    const data = localStorage.getItem(`fabric_profile_${select.value}`);
+    if (!data) return this.showToast("Profile not found", "error");
+    try {
+      const config = JSON.parse(data);
+      this.config.config = config;
+      this.showToast(`Profile loaded: ${select.value}`, "success");
+    } catch (e) {
+      this.showToast("Failed to load profile", "error");
+    }
+  }
+
+  deleteProfile() {
+    const select = document.getElementById("profileSelect");
+    if (!select || !select.value) return;
+    localStorage.removeItem(`fabric_profile_${select.value}`);
+    this.showToast(`Profile deleted: ${select.value}`, "info");
+    this.updateProfileSelect();
+  }
+
+  exportProfile() {
+    const select = document.getElementById("profileSelect");
+    if (!select || !select.value) return;
+    const data = localStorage.getItem(`fabric_profile_${select.value}`);
+    if (!data) return this.showToast("Profile not found", "error");
+    const blob = new Blob([data], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${select.value}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    this.showToast("Profile exported", "success");
+  }
+
+  importProfile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const config = JSON.parse(ev.target.result);
+        const profileName = prompt(
+          "Profile name for import:",
+          file.name.replace(/\.json$/, "")
+        );
+        if (!profileName) return;
+        localStorage.setItem(
+          `fabric_profile_${profileName}`,
+          JSON.stringify(config)
+        );
+        this.showToast(`Profile imported: ${profileName}`, "success");
+        this.updateProfileSelect();
+      } catch (err) {
+        this.showToast("Failed to import profile", "error");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  updateProfileSelect() {
+    const select = document.getElementById("profileSelect");
+    if (!select) return;
+    const profiles = Object.keys(localStorage)
+      .filter((k) => k.startsWith("fabric_profile_"))
+      .map((k) => k.replace("fabric_profile_", ""));
+    select.innerHTML = profiles
+      .map((p) => `<option value="${p}">${p}</option>`)
+      .join("");
   }
 
   async #handleClick(event) {
@@ -187,6 +305,7 @@ class FabricModGenerator {
     const { target } = event;
     if (this.#elements.configFields.includes(target.id)) {
       this.updateConfigField(target.id, target.value);
+      this.validateConfigUI();
     }
   }
 
@@ -272,6 +391,13 @@ class FabricModGenerator {
   }
 
   async generateMod() {
+    const validation = this.validator.validateBasicConfig();
+    if (validation !== true) {
+      this.showValidationErrors(validation);
+      this.showToast("Fix config errors before generating", "error");
+      return;
+    }
+    this.clearValidationErrors();
     const config = this.config.getCurrentConfig();
     const results = [];
     for (const type of this.#selectedGenerators) {
@@ -280,13 +406,36 @@ class FabricModGenerator {
         results.push(result);
         this.#generatedFiles.set(result.filename, result.content);
       } catch (error) {
-        this.logger.error(`Generation failed for ${type}`, error);
-        this.showToast(`Failed to generate ${type}`, "error");
+        this.logger.error(`Generation failed for ${type}", error);
+        this.showToast(`Failed to generate ${type}", "error");
       }
     }
     this.renderOutput(results);
     this.updateGenerateButton();
     this.logger.info("Generation complete", { files: results.length });
+  }
+
+  validateConfigUI() {
+    const validation = this.validator.validateBasicConfig();
+    if (validation === true) {
+      this.clearValidationErrors();
+    } else {
+      this.showValidationErrors(validation);
+    }
+  }
+
+  showValidationErrors(errors) {
+    for (const field in errors) {
+      const el = document.getElementById(field + "-error");
+      if (el) el.textContent = errors[field];
+    }
+  }
+
+  clearValidationErrors() {
+    ["modId", "className", "packageName", "version", "authors"].forEach((f) => {
+      const el = document.getElementById(f + "-error");
+      if (el) el.textContent = "";
+    });
   }
 
   downloadMod() {

@@ -25,12 +25,14 @@ export default {
     overlay: "com.example.client.overlay",
     config: "com.example.config",
     mixin: "com.example.mixin",
+    biome: "com.example.world.biome",
   },
   registryTypes: {
     entity: "ENTITY_TYPE",
     block: "BLOCK",
     item: "ITEM",
     screen: "SCREEN_HANDLER",
+    biome: "BIOME",
   },
   generatorTypes: [
     "entity",
@@ -42,5 +44,6 @@ export default {
     "overlay",
     "config",
     "mixin",
+    "biome",
   ],
 };

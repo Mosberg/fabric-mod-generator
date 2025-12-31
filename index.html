@@ -26,17 +26,84 @@
           <div class="header-content">
             <h1 class="logo">
               <span class="logo-icon">🧩</span>
-              Fabric Mod Generator
+              <span data-i18n="title">Fabric Mod Generator</span>
             </h1>
             <div class="header-meta">
               <span class="version">v2.0</span>
               <span class="minecraft-ver">MC 1.21.10</span>
             </div>
             <div class="header-actions">
+              <select id="langSelect" style="margin-right: 10px">
+                <option value="en">EN</option>
+                <option value="es">ES</option>
+              </select>
               <button id="themeToggle" class="theme-btn">🌙</button>
             </div>
           </div>
         </header>
+        <script>
+          // Simple i18n implementation
+          const translations = {
+            en: {
+              title: "Fabric Mod Generator",
+              "Generate Template": "Generate Template",
+              "Export Full Project": "Export Full Project",
+              "Clear Cache": "Clear Cache",
+              Profile: "Profile:",
+              Save: "Save",
+              Load: "Load",
+              Delete: "Delete",
+              Export: "Export",
+              Import: "Import",
+            },
+            es: {
+              title: "Generador de Mods Fabric",
+              "Generate Template": "Generar Plantilla",
+              "Export Full Project": "Exportar Proyecto Completo",
+              "Clear Cache": "Limpiar Caché",
+              Profile: "Perfil:",
+              Save: "Guardar",
+              Load: "Cargar",
+              Delete: "Eliminar",
+              Export: "Exportar",
+              Import: "Importar",
+            },
+          };
+          function applyI18n(lang) {
+            document.querySelectorAll("[data-i18n]").forEach((el) => {
+              const key = el.getAttribute("data-i18n");
+              if (translations[lang] && translations[lang][key]) {
+                el.textContent = translations[lang][key];
+              }
+            });
+            // Buttons and static text
+            [
+              ["generateBtn", "Generate Template"],
+              ["exportProjectBtn", "Export Full Project"],
+              ["clearCacheBtn", "Clear Cache"],
+              ["saveProfileBtn", "Save"],
+              ["loadProfileBtn", "Load"],
+              ["deleteProfileBtn", "Delete"],
+              ["exportProfileBtn", "Export"],
+              ["importProfileBtn", "Import"],
+              ["profileSelectLabel", "Profile"],
+            ].forEach(([id, key]) => {
+              const el = document.getElementById(id);
+              if (el && translations[lang][key])
+                el.textContent = translations[lang][key];
+            });
+          }
+          document
+            .getElementById("langSelect")
+            .addEventListener("change", function () {
+              applyI18n(this.value);
+              localStorage.setItem("lang", this.value);
+            });
+          // On load
+          const lang = localStorage.getItem("lang") || "en";
+          document.getElementById("langSelect").value = lang;
+          applyI18n(lang);
+        </script>
 
         <!-- Shortcuts Panel -->
         <div class="shortcuts-panel">
@@ -56,6 +123,26 @@
             <button class="tab-btn active" data-tab="basic">Basic</button>
             <button class="tab-btn" data-tab="advanced">Advanced</button>
             <button class="tab-btn" data-tab="versions">Versions</button>
+          </div>
+          <div
+            class="profile-actions"
+            style="margin: 10px 0; display: flex; gap: 8px; align-items: center"
+          >
+            <label for="profileSelect" style="margin-right: 4px"
+              >Profile:</label
+            >
+            <select id="profileSelect"></select>
+            <button id="saveProfileBtn" class="btn-secondary">Save</button>
+            <button id="loadProfileBtn" class="btn-secondary">Load</button>
+            <button id="deleteProfileBtn" class="btn-secondary">Delete</button>
+            <button id="exportProfileBtn" class="btn-secondary">Export</button>
+            <input
+              type="file"
+              id="importProfileInput"
+              style="display: none"
+              accept="application/json"
+            />
+            <button id="importProfileBtn" class="btn-secondary">Import</button>
           </div>
 
           <div class="tab-content active" id="basic-tab">
@@ -164,6 +251,21 @@ A Fabric mod for Minecraft 1.21.10</textarea
           <button class="btn-secondary" id="exportProjectBtn">
             Export Full Project
           </button>
+          <button
+            class="btn-secondary"
+            id="clearCacheBtn"
+            title="Clear code generation cache"
+          >
+            Clear Cache
+          </button>
+          <span
+            id="cacheStats"
+            style="
+              margin-left: 16px;
+              font-size: 0.95em;
+              color: var(--text-muted);
+            "
+          ></span>
         </div>
 
         <!-- Output -->
