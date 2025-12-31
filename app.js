@@ -177,18 +177,20 @@ class FabricModGenerator {
     if (importBtn) importBtn.onclick = () => importInput && importInput.click();
     if (importInput) importInput.onchange = (e) => this.importProfile(e);
     if (select) this.updateProfileSelect();
-    if (clearCacheBtn) clearCacheBtn.onclick = () => {
-      this.generators.clearCache();
-      this.showToast("Cache cleared", "info");
-      this.updateCacheStats();
-    };
+    if (clearCacheBtn)
+      clearCacheBtn.onclick = () => {
+        this.generators.clearCache();
+        this.showToast("Cache cleared", "info");
+        this.updateCacheStats();
+      };
     this.updateCacheStats();
-    updateCacheStats() {
-      const stats = this.generators.getStats();
-      const el = document.getElementById("cacheStats");
-      if (el && stats) {
-        el.textContent = `Cache: ${stats.items} items, ${stats.hits} hits, ${stats.misses} misses, hit rate: ${stats.hitRate}`;
-      }
+  }
+
+  updateCacheStats() {
+    const stats = this.generators.getStats();
+    const el = document.getElementById("cacheStats");
+    if (el && stats) {
+      el.textContent = `Cache: ${stats.items} items, ${stats.hits} hits, ${stats.misses} misses, hit rate: ${stats.hitRate}`;
     }
   }
 
@@ -406,8 +408,8 @@ class FabricModGenerator {
         results.push(result);
         this.#generatedFiles.set(result.filename, result.content);
       } catch (error) {
-        this.logger.error(`Generation failed for ${type}", error);
-        this.showToast(`Failed to generate ${type}", "error");
+        this.logger.error(`Generation failed for ${type}`, error);
+        this.showToast(`Failed to generate ${type}`, "error");
       }
     }
     this.renderOutput(results);
