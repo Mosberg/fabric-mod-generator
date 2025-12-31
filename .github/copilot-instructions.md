@@ -1,38 +1,46 @@
+
 # Copilot Instructions for fabric-mod-generator
 
 ## Project Overview
-This is a Node.js-based code generator for Minecraft Fabric mods. The project is organized by generator modules, utilities, configuration, and a simple web UI.
+This is a modular Node.js code generator for Minecraft Fabric mods. It features a live web UI, robust config profiles, and modular code generation for all major mod elements.
 
 ## Architecture & Key Components
-- **generators/**: Contains modular generators for different mod elements (block, item, entity, command, config, mixin, overlay, renderer, screen). Each generator exports functions for code and asset generation.
-- **utils/**: Shared utilities for template management, downloads, and validation.
-- **data/fabricConfig.json**: Stores mod configuration data, read by generators and utilities.
-- **app.js**: Main backend logic, orchestrates requests from the UI and delegates to generators.
-- **index.html, style.css**: Simple web UI for user interaction.
+- **app.js**: Main backend, orchestrates UI requests, loads and manages all generators, handles caching and logging.
+- **generators/**: Each file is a generator module (e.g., `blockGenerator.js`, `itemGenerator.js`). All extend `BaseGenerator` and implement a `generate(config)` method. Generators use config and templates to scaffold code/assets for their mod element.
+- **utils/**: Shared utilities for template management (`templateManager.js`), config profiles (`configProfiles.js`), downloads, logging, and validation (`validators.js`).
+- **data/fabricConfig.js**: Central mod config (JS object, not JSON). Defines mod metadata, package structure, and generator types.
+- **index.html, style.css**: Web UI for user interaction, preview, and export.
 
 ## Developer Workflows
-- **Run the app**: Use `node app.js` to start the backend. The UI is served via `index.html`.
-- **Debugging**: Edit generator modules in `generators/` and reload the app. No build step required.
-- **Configuration**: Update `data/fabricConfig.json` for mod settings. Changes are picked up on restart.
+- **Run the app**: `node app.js` (serves backend, open `index.html` in browser)
+- **Edit or add generators**: Create/modify files in `generators/`, export a class with a `generate(config)` method, and register in `app.js`.
+- **Templates**: Use `utils/templateManager.js` for project scaffolding and file templates.
+- **Validation**: Add/modify rules in `utils/validators.js` (used by all generators via `BaseGenerator`).
+- **Config**: Edit `data/fabricConfig.js` for mod defaults, structure, and generator types. Changes require app restart.
+- **Debugging**: No build step. Edit code and reload app/UI.
 
 ## Project-Specific Patterns
-- **Generator Pattern**: Each generator module follows a similar export structure (e.g., `generateBlock`, `generateItem`). Utilities are imported from `utils/`.
-- **Template Usage**: Templates are managed via `utils/templateManager.js` and used in generators for code scaffolding.
-- **Validation**: Input validation is centralized in `utils/validators.js`.
-- **No external build tools**: Pure Node.js, no bundlers or transpilers.
+- **Generator Pattern**: All generators extend `BaseGenerator`, use `validateName` and `getPackage` helpers, and expect a config object. Example: see `blockGenerator.js` or `entityGenerator.js`.
+- **Config Profiles**: Managed in-browser via `utils/configProfiles.js` (uses localStorage). UI allows save/load of profiles.
+- **Caching**: Code generation is cache-aware (see `GenerationCache` in `utils/loggerCache.js`).
+- **Logging**: Use the `Logger` class for structured logs. Errors are handled via `ErrorHandler`.
+- **No build tools**: Pure Node.js, no transpilers or bundlers. All code is ES modules.
 
 ## Integration Points
-- **External dependencies**: Only Node.js standard modules and any dependencies listed in `package.json` (if present).
-- **Cross-component communication**: Generators are called from `app.js` based on UI actions; data flows from `fabricConfig.json` through utilities to generators.
+- **External dependencies**: Only Node.js built-ins and those in `package.json` (if present).
+- **Cross-component flow**: UI triggers backend (via `app.js`), which loads config, validates, and delegates to the correct generator. Generators use templates/utilities and return code/assets to the UI for preview/export.
+- **Export**: Full project export uses `TemplateManager.createFullProject(config)` to scaffold a ready-to-build Fabric mod.
 
 ## Examples
-- To add a new generator, create a new file in `generators/`, export a function, and update `app.js` to use it.
-- To change mod config, edit `data/fabricConfig.json` and restart the app.
+- **Add a generator**: Copy a file in `generators/`, export a class with `generate(config)`, and register in `app.js`.
+- **Change mod config**: Edit `data/fabricConfig.js` and restart the app.
+- **Edit templates**: Update `utils/templateManager.js`.
 
 ## References
 - See `generators/` for code generation patterns.
-- See `utils/templateManager.js` for template usage.
-- See `app.js` for orchestration logic.
+- See `utils/templateManager.js` for project scaffolding.
+- See `app.js` for orchestration and generator registration.
+- See `README.md` and `docs/1/IMPLEMENTATION_GUIDE.md` for more details.
 
 ---
 If any section is unclear or missing details, please provide feedback for further refinement.
