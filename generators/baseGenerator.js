@@ -169,12 +169,15 @@ public class ${className} {
 
   getRegistryField(type, className) {
     const registryType = this.getRegistryType(type);
-    const modId = this.getModId(className);
     return `public static final ${className}${
       type === "block" ? "Block" : ""
     } ${className.toUpperCase()} = Registry.register(
     Registries.${registryType},
     Identifier.of("${this.config.modId}", "${className.toLowerCase()}"),
     new ${className}());`;
+  }
+
+  capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 }

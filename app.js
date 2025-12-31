@@ -23,7 +23,7 @@ const generatorImports = [
   ["renderer", "./generators/rendererGenerator.js"],
   ["screen", "./generators/screenGenerator.js"],
   ["recipe", "./generators/recipeEventGenerator.js"],
-  ["event", "./generators/recipeEventGenerator.js"],
+  // ["event", "./generators/eventGenerator.js"], // Removed or commented out
   ["biome", "./generators/biomeGenerator.js"],
 ];
 
@@ -31,9 +31,49 @@ async function loadGenerators() {
   const modules = {};
   for (const [type, path] of generatorImports) {
     const mod = await import(path);
-    modules[type] =
-      mod[`${type.charAt(0).toUpperCase()}${type.slice(1)}Generator`] ||
-      mod[type === "recipe" ? "RecipeGenerator" : "EventGenerator"];
+    // Map generator type to correct exported class name
+    let className = "";
+    switch (type) {
+      case "block":
+        className = "BlockGenerator";
+        break;
+      case "command":
+        className = "CommandGenerator";
+        break;
+      case "config":
+        className = "ConfigGenerator";
+        break;
+      case "entity":
+        className = "EntityGenerator";
+        break;
+      case "item":
+        className = "ItemGenerator";
+        break;
+      case "mixin":
+        className = "MixinGenerator";
+        break;
+      case "overlay":
+        className = "OverlayGenerator";
+        break;
+      case "renderer":
+        className = "RendererGenerator";
+        break;
+      case "screen":
+        className = "ScreenGenerator";
+        break;
+      case "recipe":
+        className = "RecipeGenerator";
+        break;
+      case "event":
+        className = "EventGenerator";
+        break;
+      case "biome":
+        className = "BiomeGenerator";
+        break;
+      default:
+        className = `${type.charAt(0).toUpperCase()}${type.slice(1)}Generator`;
+    }
+    modules[type] = mod[className];
   }
   return modules;
 }

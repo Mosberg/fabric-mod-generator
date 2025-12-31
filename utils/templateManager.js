@@ -181,11 +181,11 @@ Output JARs are in \`build/libs/\`
 `;
   }
 
-  getGradleProperties(config) {
+  getGradleProperties() {
     return "";
   }
 
-  getModsToml(config) {
+  getModsToml() {
     return "";
   }
 }

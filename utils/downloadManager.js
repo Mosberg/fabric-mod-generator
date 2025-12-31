@@ -1,5 +1,10 @@
 export class DownloadManager {
   downloadFile(content, filename) {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      throw new Error(
+        "downloadFile can only be used in a browser environment."
+      );
+    }
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

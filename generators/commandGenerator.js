@@ -1,6 +1,10 @@
 import { BaseGenerator } from "./baseGenerator.js";
 
 export class CommandGenerator extends BaseGenerator {
+  capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   async generate(config) {
     this.config = config;
     // Validate using modId, not className
@@ -8,6 +12,7 @@ export class CommandGenerator extends BaseGenerator {
 
     const pkg = this.getPackage("command");
     const commandId = config.modId; // Use modId for command ID
+    const name = this.capitalize(config.modId); // Capitalized name for class/methods
     const code = `package ${pkg};
 
 import com.mojang.brigadier.CommandDispatcher;

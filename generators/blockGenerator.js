@@ -33,11 +33,15 @@ export class BlockGenerator extends BaseGenerator {
     this.validateName(name, "block");
 
     const pkg = this.getPackage("block");
+    // Use config values for hardness and sound, and fix Identifier and Item.Settings usage
+    const hardness =
+      typeof config.hardness === "number" ? config.hardness : 5.0;
+    const sound = (config.sound || "STONE").toUpperCase();
+    const soundGroup = `BlockSoundGroup.${sound}`;
     const code = `package ${pkg};
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -45,22 +49,23 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.FabricBlockSettings;
 
 public class ${name}Block extends Block {
     public static final ${name}Block BLOCK = Registry.register(
         Registries.BLOCK,
-        Identifier.of("${config.modId}", "${name.toLowerCase()}"),
-        new ${name}Block(FabricBlockSettings.create()
-            .material(Material.STONE)
-            .strength(5.0f, 6.0f)
-            .sounds(BlockSoundGroup.STONE))
+        new Identifier("${config.modId}", "${name.toLowerCase()}"),
+        new ${name}Block(FabricBlockSettings.of(Blocks.STONE)
+            .strength(${hardness}f, 6.0f)
+            .sounds(${soundGroup}))
     );
 
     public static final Item ITEM = Registry.register(
         Registries.ITEM,
-        Identifier.of("${config.modId}", "${name.toLowerCase()}"),
-        new BlockItem(BLOCK, new Item.Settings().groups(ItemGroup.BUILDING_BLOCKS))
+        new Identifier("${config.modId}", "${name.toLowerCase()}"),
+        new BlockItem(BLOCK, new Item.Settings().group(ItemGroup.BUILDING_BLOCKS))
     );
 
     public ${name}Block(Settings settings) {

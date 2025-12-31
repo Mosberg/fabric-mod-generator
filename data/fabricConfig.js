@@ -1,4 +1,4 @@
-export default {
+const config = {
   minecraftVersion: "1.21.10",
   yarnMappings: "1.21.10+build.3",
   loaderVersion: "0.18.4",
@@ -33,6 +33,7 @@ export default {
     item: "ITEM",
     screen: "SCREEN_HANDLER",
     biome: "BIOME",
+    type: "CRAFTING_SHAPED",
   },
   generatorTypes: [
     "entity",
@@ -47,3 +48,6 @@ export default {
     "biome",
   ],
 };
+
+Object.freeze(config);
+export default config;

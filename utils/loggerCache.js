@@ -27,7 +27,7 @@ export class Logger {
 
   /** Cache timestamp per log call to avoid repeated Date creation */
   _format(level, message, data = null) {
-    const timestamp = performance.now().toFixed(3);
+    const timestamp = Date.now();
     const base = `[${timestamp}] [${level}] [${this.namespace}] ${message}`;
     return data ? `${base} ${JSON.stringify(data, null, 0)}` : base;
   }

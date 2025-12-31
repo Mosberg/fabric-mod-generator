@@ -11,9 +11,6 @@ export class BiomeGenerator extends BaseGenerator {
 
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeEffects;
-import net.minecraft.world.biome.BiomeKeys;
-import net.minecraft.world.biome.BiomeWeather;
-import net.minecraft.world.gen.feature.DefaultBiomeFeatures;
 import net.minecraft.sound.BiomeMoodSound;
 
 public class ${name}Biome {

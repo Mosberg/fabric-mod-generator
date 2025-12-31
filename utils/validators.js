@@ -1,7 +1,11 @@
 export class Validator {
+  static MODID_REGEX = /^[a-z0-9\-_]{2,64}$/;
+  static CLASSNAME_REGEX = /^[A-Z][A-Za-z0-9]{2,63}$/;
+  static PACKAGE_REGEX = /^[a-z][a-z0-9_.]{2,63}$/;
+  static VERSION_REGEX = /^\d+\.\d+\.\d+([-.\w]*)?$/;
+
   validateModId(modId) {
-    const validModId = /^[a-z0-9\-_]{2,64}$/;
-    if (!validModId.test(modId)) {
+    if (!Validator.MODID_REGEX.test(modId)) {
       return {
         valid: false,
         error:
@@ -12,8 +16,7 @@ export class Validator {
   }
 
   validateClassName(className) {
-    const validClassName = /^[A-Z][A-Za-z0-9]{2,64}$/;
-    if (!validClassName.test(className)) {
+    if (!Validator.CLASSNAME_REGEX.test(className)) {
       return {
         valid: false,
         error:
@@ -24,8 +27,7 @@ export class Validator {
   }
 
   validatePackageName(packageName) {
-    const validPackage = /^[a-z][a-z0-9_.]{2,64}$/;
-    if (!validPackage.test(packageName)) {
+    if (!Validator.PACKAGE_REGEX.test(packageName)) {
       return {
         valid: false,
         error:
@@ -36,8 +38,7 @@ export class Validator {
   }
 
   validateVersion(version) {
-    const validVersion = /^\d+\.\d+\.\d+([-.\w]*)?$/;
-    if (!validVersion.test(version)) {
+    if (!Validator.VERSION_REGEX.test(version)) {
       return {
         valid: false,
         error: "Version must be in format X.Y.Z (e.g., 1.0.0)",
@@ -47,7 +48,8 @@ export class Validator {
   }
 
   validateAuthors(authors) {
-    if (!authors || authors.length === 0) {
+    if (!authors || authors.filter((a) => a.trim()).length === 0) {
+      // ^ ensure at least one non-empty author
       return { valid: false, error: "At least one author required" };
     }
     return { valid: true };
@@ -77,16 +79,20 @@ export class Validator {
     const version = document.getElementById("version")?.value.trim() || "1.0.0";
     const authors = document.getElementById("authors")?.value.trim() || "";
     const errors = {};
-    if (!this.validateModId(modId).valid)
-      errors.modId = this.validateModId(modId).error;
-    if (!this.validateClassName(className).valid)
-      errors.className = this.validateClassName(className).error;
-    if (!this.validatePackageName(packageName).valid)
-      errors.packageName = this.validatePackageName(packageName).error;
-    if (!this.validateVersion(version).valid)
-      errors.version = this.validateVersion(version).error;
-    if (!this.validateAuthors(authors.split(",")).valid)
-      errors.authors = this.validateAuthors(authors.split(",")).error;
+    const modIdResult = this.validateModId(modId);
+    if (!modIdResult.valid) errors.modId = modIdResult.error;
+    const classNameResult = this.validateClassName(className);
+    if (!classNameResult.valid) errors.className = classNameResult.error;
+    const packageNameResult = this.validatePackageName(packageName);
+    if (!packageNameResult.valid) errors.packageName = packageNameResult.error;
+    const versionResult = this.validateVersion(version);
+    if (!versionResult.valid) errors.version = versionResult.error;
+    const authorsArr = authors
+      .split(",")
+      .map((a) => a.trim())
+      .filter(Boolean);
+    const authorsResult = this.validateAuthors(authorsArr);
+    if (!authorsResult.valid) errors.authors = authorsResult.error;
     return Object.keys(errors).length === 0 ? true : errors;
   }
 
